@@ -10,6 +10,6 @@ Le bot n'a pas trop d'objectif à part réaliser des choses que je souhaite qu'i
 Il est en pleine évolution, et j'ai pas prévu qu'il ait de finalité, il sera en constante évolution x)
 
 Comme je l'ai dit dans la permière phrase en anglais, le bot est privé et est accessible seulement sur le discUniverse,
-qui est mon serveur discord x)
+qui est mon serveur discord principal (https://discord.gg/9VfbD6d) x)
 
 Je verrais pour le mettre plus tard public si certains sont intéressés ^^
