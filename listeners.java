@@ -131,8 +131,6 @@ public class listeners extends ListenerAdapter {
                         break;
 
                 }
-
-
             }
 
             if (contenuMess.contains("ça va")){
