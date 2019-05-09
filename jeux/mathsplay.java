@@ -14,7 +14,7 @@ public class mathsplay {
         String contenuMess = mess.getContentDisplay();
         String[] mots = contenuMess.split(" ");
         File playerFile = new File("data/mathsplay/" + member.getUser().getId() + ".txt");
-        
+
         if (mots.length == 2 || mots.length == 3) {
 
             try {
@@ -23,46 +23,32 @@ public class mathsplay {
 
                 switch (mots[1]) {
                     case "respond":
-                        if (playerFile.exists()) {
-                            reader.readLine();
-                            String result = reader.readLine();
-                            reader.close();
+                        reader.readLine();
+                        String result = reader.readLine();
+                        reader.close();
 
-                            if (mots[2].equals(result)) {
-                                sendMess(mess, "Bien joué ! Tu as trouvé le résultat :wink:");
-                                playerFile.delete();
-                            } else {
-                                sendMess(mess, "Non, ce n'est pas le bon résultat !");
-                            }
+                        if (mots[2].equals(result)) {
+                            sendMess(mess, "Bien joué ! Tu as trouvé le résultat :wink:");
+                            playerFile.delete();
                         } else {
-                            sendMess(mess, "Tu n'a pas créé de partie !" + espace() + "Pour en créer une, écris `ur/mathsplay new <nombreMaximal> <signe>`" + espace() +
-                                    "Sachant que le nombre maximal peut être au maximum 2147483647, et signe peut être `+`, `-` ou`*`");
+                            sendMess(mess, "Non, ce n'est pas le bon résultat !");
                         }
                         break;
 
                     case "remind":
-                        if (playerFile.exists()) {
-                            sendMess(mess, "Tu dois trouver la réponse au calcul '" + reader.readLine() + "'");
-                        } else {
-                            sendMess(mess, "Tu n'a pas créé de partie !" + espace() + "Pour en créer une, écris `ur/mathsplay new <nombreMaximal> <signe>`" + espace() +
-                                    "Sachant que le nombre maximal peut être au maximum 2147483647, et signe peut être `+`, `-` ou`*`");
-                        }
+                        sendMess(mess, "Tu dois trouver la réponse au calcul '" + reader.readLine() + "'");
                         reader.close();
                         break;
 
                     case "stop":
-                        if (playerFile.exists()) {
-                            sendMess(mess, "La réponse au calcul '" + reader.readLine() + "' était " + reader.readLine());
-                            playerFile.delete();
-                        } else {
-                            sendMess(mess, "Tu n'a pas créé de partie !" + espace() + "Pour en créer une, écris `ur/mathsplay new <nombreMaximal> <signe>`" + espace() +
-                                    "Sachant que le nombre maximal peut être au maximum 2147483647, et signe peut être `+`, `-` ou`*`");
-                        }
+                        sendMess(mess, "La réponse au calcul '" + reader.readLine() + "' était " + reader.readLine());
                         reader.close();
+                        playerFile.delete();
                         break;
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                sendMess(mess, "Tu n'a pas créé de partie !" + espace() + "Pour en créer une, écris `ur/mathsplay new <nombreMaximal> <signe>`" + espace() +
+                        "Sachant que le nombre maximal peut être au maximum 2147483647, et le signe peut être `+`, `-` ou`*`");
             }
 
         } else if(mots.length == 4 && mots[1].equals("new")){
@@ -110,8 +96,14 @@ public class mathsplay {
             } catch(IOException e){
                 e.printStackTrace();
             }
+        } else if(contenuMess.equals("ur/mathsplayinfo")){
+            sendMess(mess, "Le jeu 'mathsplay' est un jeu de calcul mental tout simplement x)" + espace() +
+                    "Vous pouvez lancer une partie via la commande `ur/mathsplay new <nombreMaximal> <signe>`" + espace() +
+                    "Sachant que le nombre maximum du nombre maximal est 2147483647, et le signe peut être `+`, `-` ou`*`" + espace() +
+                    "Pour répondre, écrivez la commande `ur/mathsplay respond <réponse>` ; si vous ne vous souvenez plus le bot peut vous rappeler le calcul avec la commande " +
+                    "`ur/mathsplay remind` et enfin pour stopper la commande est `ur/mathsplay stop`");
         } else {
-            sendMess(mess, "[Erreur] Syntaxe : ur/mathsplay new <nombreMaximal> <signe>" + espace() + "Sachant que le nombre maximal peut être au maximum 2147483647, et signe peut être `+`, `-` ou`*`");
+            sendMess(mess, "[Erreur] Syntaxe : `ur/mathsplay new <nombreMaximal> <signe>`" + espace() + "Sachant que le nombre maximal peut être au maximum 2147483647, et signe peut être `+`, `-` ou`*`");
         }
 
 
