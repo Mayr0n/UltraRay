@@ -18,96 +18,14 @@ public class listeners extends ListenerAdapter {
 
             Message mess = e.getMessage();
             String contenuMess = mess.getContentDisplay();
-            String contenuMessRaw = mess.getContentRaw();
             Guild server = e.getGuild();
 
             if (contenuMess.contains("ur/")) {
-
-                Commandes c = new Commandes();
-                c.testCommande(mess, server, e.getMember());
-
+                new Commandes().testCommande(mess, server, e.getMember());
             }
 
             if (contenuMess.equalsIgnoreCase("ping")) {
-
-                File register = new File("data/pingpong/register.txt");
-
-                try {
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(register), StandardCharsets.UTF_8));
-
-                    try {
-
-                        String playerID = reader.readLine();
-                        String channelID = reader.readLine();
-                        String pseudo = reader.readLine();
-                        String difficulty = reader.readLine();
-
-                        if (playerID != null) {
-
-                            if (e.getAuthor().getId().equalsIgnoreCase(playerID) && mess.getChannel().getId().equalsIgnoreCase(channelID)) {
-
-                                Random r = new Random();
-
-                                int rand = r.nextInt(100);
-
-                                if (difficulty.equalsIgnoreCase("facile")) {
-
-                                    if (rand < 20) {
-                                        sendMess(mess,"*J'ai loupé mon coup...* :no_mouth: **Point pour toi !**");
-                                    } else if (rand >= 80) {
-                                        sendMess(mess,"**Smash ! :muscle: Point pour moi !**");
-                                    } else {
-                                        sendMess(mess,"*pong !* :ping_pong:");
-                                    }
-
-                                } else if (difficulty.equalsIgnoreCase("moyen")) {
-
-                                    if (rand > 10 && rand <= 20) {
-                                        sendMess(mess,"*J'ai loupé mon coup...* :no_mouth: **Point pour toi !**");
-                                    } else if (rand >= 80) {
-                                        sendMess(mess,"**Smash ! :muscle: Point pour moi !**");
-                                    } else {
-                                        sendMess(mess,"*pong !* :ping_pong:");
-                                    }
-
-                                } else if (difficulty.equalsIgnoreCase("difficile")) {
-
-                                    if (rand <= 10) {
-                                        sendMess(mess,"*J'ai loupé mon coup...* :no_mouth: **Point pour toi !**");
-                                    } else if (rand >= 80) {
-                                        sendMess(mess,"**Smash ! :muscle: Point pour moi !**");
-                                    } else {
-                                        sendMess(mess,"*pong !* :ping_pong:");
-                                    }
-                                }
-
-                                reader.close();
-
-                            } else {
-
-                                sendMess(mess,"C'est " + pseudo + " qui est enregistré ! Il doit jouer dans le salon #" + server.getTextChannelById(channelID).getName());
-
-                            }
-                        } else {
-
-                            sendMess(mess,"Personne n'est enregistré ! Pour s'enregistrer : `ur/pingpong <NombreDeManches>`");
-
-                        }
-
-
-                    } catch (IOException ee) {
-
-                        sendMess(mess,"Une erreur est apparue dans le reader");
-
-                    }
-
-                } catch (FileNotFoundException ee) {
-
-                    sendMess(mess,"Personne n'est enregistré !");
-                }
-
-
+                new jeux.pingpong().ping(mess, server);
             }
 
             if (contenuMess.contains("Coucou") || contenuMess.contains("Salut") || contenuMess.contains("salut") || contenuMess.contains("coucou")) {
@@ -131,6 +49,8 @@ public class listeners extends ListenerAdapter {
                         break;
 
                 }
+
+
             }
 
             if (contenuMess.contains("ça va")){
