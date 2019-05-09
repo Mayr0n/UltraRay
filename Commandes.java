@@ -2,15 +2,15 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.managers.GuildController;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Random;
 
 public class Commandes {
+
+    private static String idMay = "301715312603168769";
 
     @SuppressWarnings("Unused")
     public void testCommande(Message mess, Guild server, Member member){
@@ -34,28 +34,19 @@ public class Commandes {
        else if(contenuMess.contains("kick") && member.hasPermission(Permission.KICK_MEMBERS)){
             kick(mess, server);
        }
-       else if(contenuMess.contains("pingpong")){
-            pingpong(mess, member);
-       }
-       else if(contenuMess.contains("pstop")){
-            pingpongStop(mess, member);
+       else if(contenuMess.contains("pp")){
+            new jeux.pingpong().pingpong(mess, member);
        }
        else if(contenuMess.contains("dab")){
            sendMess(mess,"https://tenor.com/view/dab-dab-problem-dab-dance-gif-5412848");
        }
-       else if(contenuMess.contains("pstaffstop") && member.hasPermission(Permission.KICK_MEMBERS)){
-            File file = new File("data/pingpong/register.txt");
-            file.delete();
-           sendMess(mess,"La personne enregistrée a été reset !");
-
-       }
-       else if(contenuMess.contains("renameall") && member.hasPermission(Permission.KICK_MEMBERS)){
+       else if(contenuMess.contains("renameall") && member.isOwner()){
             renameAll(mess, server);
        }
-       else if(contenuMess.contains("idsall") && member.hasPermission(Permission.KICK_MEMBERS)){
+       else if(contenuMess.contains("idsall") && member.isOwner()){
             getIdsAll(mess, server);
        }
-       else if(contenuMess.contains("resetallnames") && member.hasPermission(Permission.KICK_MEMBERS)){
+       else if(contenuMess.contains("resetallnames") && member.isOwner()){
            List<Member> listUser = server.getMembers();
            GuildController serverAdmin = server.getController();
 
@@ -89,6 +80,9 @@ public class Commandes {
            } else {
                sendMess(mess, "[Erreur syntaxe !] Syntaxe : `ur/getid <salon ou membre#0000>");
            }
+       }
+       else if(contenuMess.contains("mathsplay")){
+           new jeux.mathsplay().mathsplay(member, mess);
        }
     }
 
@@ -172,125 +166,6 @@ public class Commandes {
             sendMess(mess,l.get(0).getEffectiveName() + " a été kick");
         } else {
             sendMess(mess,"Mais qui faut-il kick ? `Syntaxe : ur/kick <Membre>`");
-        }
-    }
-    private static void pingpong(Message mess, Member member) {
-        String contenuMess = mess.getContentDisplay();
-        File register = new File("./PP/Register/register.txt");
-
-        if (!register.exists()) {
-
-            try {
-                register.createNewFile();
-                register(mess, contenuMess, register, member.getUser());
-            } catch (IOException ee) {
-                System.out.print("Une erreur de fichier est apparue");
-            }
-
-        } else {
-            register(mess, contenuMess, register, member.getUser());
-        }
-    }
-    private static void register(Message mess, String contenuMess, File file, User u) {
-
-        try {
-
-            String[] s = contenuMess.split(" ");
-
-            if (s.length > 1) {
-
-                if (s[1].equalsIgnoreCase("facile") || s[1].equalsIgnoreCase("moyen") || s[1].equalsIgnoreCase("difficile")) {
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
-                    String line = reader.readLine();
-                    reader.readLine();
-                    String pseudo = reader.readLine();
-
-                    if (line == null) {
-                        try {
-
-                            FileWriter writer = new FileWriter(file);
-                            BufferedWriter bw = new BufferedWriter(writer);
-
-                            bw.write(u.getId());
-                            bw.newLine();
-                            bw.write(mess.getChannel().getId());
-                            bw.newLine();
-                            bw.write(u.getName());
-                            bw.newLine();
-                            bw.write(s[1]);
-
-                            bw.close();
-                            writer.close();
-
-                            sendMess(mess,"Allez go !" + espace() + espace() + "Ecris 'ping' pour frapper dans la raquette !");
-                            //et 'smash' pour smash (2 maximum par partie)
-
-                        } catch (IOException ee) {
-                            System.out.print("Une erreur dans le writer et/ou le buffer est apparue");
-                        }
-                    } else if (line.equalsIgnoreCase(u.getId())) {
-
-                        sendMess(mess,"Tu es déjà enregistré.e ! :upside_down: ");
-
-                    } else {
-
-                        sendMess(mess,"Quelqu'un s'est déjà enregistré ! Dites à " + pseudo + " de se dépêcher ou de stopper sa partie !");
-
-                    }
-                    reader.close();
-                } else {
-
-                    sendMess(mess,"La difficulté doit être 'facile', 'moyen', ou 'difficile' !");
-
-                }
-            } else {
-
-                sendMess(mess,"**[Erreur !] Syntaxe : ur/pingpong <Difficulté>**" + espace() + "Sachant qu'il existe :" + espace() +
-                        "```Facile," + espace() + "Moyen," + espace() + "Difficile```");
-
-            }
-
-        } catch (IOException ee) {
-            System.out.print("Une erreur dans le reader est apparue");
-        }
-
-    }
-    private static void pingpongStop(Message mess, Member member){
-        String contenuMess = mess.getContentDisplay();
-        User u = member.getUser();
-
-        String[] s = contenuMess.split(" ");
-
-        File register = new File("../Register/register.txt");
-
-        try {
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(register), StandardCharsets.UTF_8));
-
-            String playerID = reader.readLine();
-            String channelID = reader.readLine();
-            String pseudo = reader.readLine();
-            String diff = reader.readLine();
-
-            reader.close();
-
-            if (u.getId().equalsIgnoreCase(playerID)) {
-
-                register.delete();
-
-                sendMess(mess,"Tu n'es plus enregistré.e !");
-
-            } else {
-
-                sendMess(mess,"C'est " + pseudo + " qui doit faire cette commande pour stopper sa partie !");
-
-            }
-
-        } catch (IOException ee) {
-
-            System.out.print("Oops (ligne 271)");
-
         }
     }
     private static void renameAll(Message mess, Guild server){
