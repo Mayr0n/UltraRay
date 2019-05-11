@@ -37,60 +37,24 @@ public class commandes {
                }
                break;
            case "ur/joke":
-               Random r = new Random();
-               int i = r.nextInt(14);
-               switch (i) {
+               File jokeFolder = new File("data/jokes/");
+               File[] jokes = jokeFolder.listFiles();
+               if(jokes != null){
+                   Random r = new Random();
+                   int i = r.nextInt(jokes.length);
 
-                   case 1:
-                       sendMess(mess, "VOUS SAVEZ COMMENT LAURENT RUQUIER RETIRE SA CAPOTE ?" + espace() + "EN PETANT");
-                       break;
-                   case 2:
-                       sendMess(mess,"Pourquoi dit-on que Jules César était gay?" + espace() + "Car quand Vercingétorix s'est mit à genoux, il a eu la Gaulle");
-                       break;
-                   case 3:
-                       sendMess(mess,"C'est l'histoire d'une fleur qui court et qui se plante...");
-                   case 4:
-                       sendMess(mess,"Qu'est ce que le moyen de transport favori des humoristes ?" + espace() + "La caravanne");
-                       break;
-                   case 5:
-                       sendMess(mess,"Qu'est ce qui est jaune et noir ?" + espace() + "Une abeille...");
-                       break;
-                   case 6:
-                       sendMess(mess,
-                               "Alors c'est un petit cowboy, un petit cowboy énervé, il rentre dans le cowboy, il rentre dans le saloon et il fait : " + espace() +
-                                       "Qui c'est qui a osé peindre mon cheval en bleu ??" + espace() +
-                                       "puis là t'as un énooooorme gaillard qui se lève du comptoir, il dit :" + espace() +
-                                       "C'est moi, pourquoi ?" + espace() +
-                                       "puis t'as le cowboy, il fait :" + espace() +
-                                       "Ah non mais c'est juste pour savoir quand vous alliez mettre la deuxième couche...");
-                       break;
-                   case 7:
-                       sendMess(mess,"Qu'est ce qui est jaune et qui attend ?" + espace() + "Un gilet jaune sur un rond point.");
-                       break;
-                   case 8:
-                       sendMess(mess,"Quel est le point commun entre un sumo et un mauvais humoriste ?" + espace() + "Ils sont tous les deux lourds...");
-                       break;
-                   case 9:
-                       sendMess(mess,
-                               "Vous avez une idée de la blague que je vais faire ?" + espace() +
-                                       "Aucune idée ?" + espace() +
-                                       "C'est normal car c'est Johnny qui à l'idée puisque Johnny Halliday");
-                       break;
-                   case 10:
-                       sendMess(mess,"Tu veux une blague avec une chute ?" + espace() + "Bah c'est un mec qui court puis il tombe...");
-                       break;
-                   case 11:
-                       sendMess(mess,"C'est quoi le pays le plus cool du monde ?" + espace() + "Le Yémen parce que yeah men !!!!!");
-                       break;
-                   case 12:
-                       sendMess(mess,"Attention, il ne faut pas confondre un coca cola aux glaçons et un caca collé au caleçon.");
-                       break;
-                   case 13:
-                       sendMess(mess,"Comment on appelle un boomerang qui revient pas ?" + espace() + "Un bâton.");
-                       break;
-                   case 14:
-                       sendMess(mess,"Comment on appelle un boomerang qui revient pas ?" + espace() + "Un chat mort.");
-                       break;
+                   File joke = jokes[i];
+                   try {
+                       BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(joke), StandardCharsets.UTF_8));
+                       String line = reader.readLine();
+                       while(line != null){
+                           sendMess(mess, line);
+                           line = reader.readLine();
+                       }
+                       reader.close();
+                   } catch (IOException e) {
+                       e.printStackTrace();
+                   }
                }
                break;
            case "ur/kick":
