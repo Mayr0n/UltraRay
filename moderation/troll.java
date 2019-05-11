@@ -12,14 +12,15 @@ import java.util.Random;
 import static main.speedy.sendMess;
 
 public class troll {
-    public void bound(Member member, Message mess, Guild server){
+    public void bound(Message mess, Guild server){
 
         try {
             File file = new File("data/moderation/troll.txt");
 
-            if(!file.exists()){
+            if(!file.exists() && mess.getMentionedMembers() != null && mess.getMentionedMembers().size() == 1){
                 FileWriter writer = new FileWriter(file);
                 BufferedWriter bw = new BufferedWriter(writer);
+                Member member = mess.getMentionedMembers().get(0);
 
                 String id = member.getUser().getId();
                 bw.write(id);
