@@ -56,46 +56,21 @@ public class realModeration {
             ie.printStackTrace();
         }
     }
-    public void countMessages(Guild server) {
-        System.out.println();
-        File counterFolder = new File(speedy.getServerFolder(server) + "moderation/counters/");
-        File counter = new File(speedy.getServerFolder(server) + "moderation/counters/" + speedy.getDate().toString().substring(0,10) + ".txt");
-        speedy.testFolderExist(counterFolder);
-        speedy.testFileExist(counter);
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(counter), StandardCharsets.UTF_8));
-            String nb = reader.readLine();
-            FileWriter writer = new FileWriter(counter);
-            BufferedWriter bw = new BufferedWriter(writer);
-            if(nb == null){
-                nb = "1";
-                bw.write(nb);
-            } else {
-                int i = Integer.parseInt(nb);
-                i++;
-                nb = Integer.toString(i);
-                bw.write(nb);
-            }
-            bw.close();
-            writer.close();
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-    }
     public void closeChannels(Guild server){
         List<Channel> channels = server.getChannels();
         for(Channel channel : channels){
-            channel.getManager().setSlowmode(7200).queue();
+            if(channel.getType().equals(ChannelType.TEXT)){
+                channel.getManager().setSlowmode(120).queue();
+            }
         }
 
     }
     public void openChannels(Guild server){
         List<Channel> channels = server.getChannels();
         for(Channel channel : channels){
-            channel.getManager().setSlowmode(0).queue();
+            if(channel.getType().equals(ChannelType.TEXT)) {
+                channel.getManager().setSlowmode(0).queue();
+            }
         }
 
     }
