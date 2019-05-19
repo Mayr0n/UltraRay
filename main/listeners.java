@@ -23,9 +23,7 @@ public class listeners extends ListenerAdapter {
 
             if(contenuMess.contains("@someone")){
                 List<Member> members = server.getMembers();
-                Random r = new Random();
-                int random = r.nextInt(members.size());
-                speedy.sendMess(mess, "<@" + members.get(random).getUser().getId() + ">");
+                speedy.sendMess(mess, "<@" + members.get(new Random().nextInt(members.size())).getUser().getId() + ">");
             }
 
             if (contenuMess.length() > 3 && contenuMess.substring(0, 3).equals("ur/")) {
@@ -39,7 +37,7 @@ public class listeners extends ListenerAdapter {
             new talkness.politeness().politeness(mess, server);
             new moderation.realModeration().censure(server, mess, e.getAuthor());
             new moderation.troll().testBound(e.getMember(), mess);
-            new moderation.realModeration().countMessages(server);
+            new moderation.features().countMessages(server);
         }
     }
     @Override
