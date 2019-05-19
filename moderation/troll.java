@@ -1,5 +1,6 @@
 package moderation;
 
+import main.speedy;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
@@ -15,7 +16,7 @@ public class troll {
     public void bound(Message mess, Guild server){
 
         try {
-            File file = new File("data/moderation/troll.txt");
+            File file = new File(speedy.getServerFolder(server) + "moderation/troll.txt");
 
             if(!file.exists() && mess.getMentionedMembers() != null && mess.getMentionedMembers().size() == 1){
                 FileWriter writer = new FileWriter(file);
@@ -41,12 +42,13 @@ public class troll {
 
     }
     public void testBound(Member member, Message mess){
-        File file = new File("data/moderation/troll.txt");
+        File file = new File(speedy.getServerFolder(mess.getGuild()) + "moderation/troll.txt");
 
         if(file.exists()){
             try {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
                 String id = reader.readLine();
+                reader.close();
 
                 if(member.getUser().getId().equals(id)){
                     Random r = new Random();
@@ -56,6 +58,16 @@ public class troll {
                         sendMess(mess, "Mais carrément");
                     } else if (i >= 40 && i <= 50) {
                         sendMess(mess, "Chut");
+                    } else if(i > 50 && i < 60){
+                        for(int ii = 0 ; ii <= 10 ; ii++){
+                            sendMess(mess, "<@" + member.getUser().getId() + ">");
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        sendMess(mess, ":)");
                     } else if (i >= 60 && i <= 80) {
                         sendMess(mess, "C'est chiant");
                     } else if (i >= 90) {
@@ -65,9 +77,6 @@ public class troll {
                         sendMess(mess, "Plop un un message nul en moins");
                     }
                 }
-
-                reader.close();
-
             } catch(IOException e){
                 e.printStackTrace();
             }
@@ -76,7 +85,7 @@ public class troll {
 
     }
     public void unbound(Message mess){
-        File file = new File("data/moderation/troll.txt");
+        File file = new File(speedy.getServerFolder(mess.getGuild()) + "moderation/troll.txt");
 
         if(file.exists()){
             file.delete();
@@ -85,7 +94,7 @@ public class troll {
             sendMess(mess, "Personne n'est bound !");
         }
     }
-    public void spam(Message mess){
+    public void spam(Message mess) throws NumberFormatException{
         String contenuMess = mess.getContentDisplay();
         String[] mots = contenuMess.split(" ");
         List<Member> mentionned = mess.getMentionedMembers();
