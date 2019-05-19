@@ -1,5 +1,6 @@
 package moderation;
 
+import main.speedy;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
@@ -43,15 +44,12 @@ public class features {
         }
     }
     public void getIdsAll(Message mess, Guild server){
-        File file = new File("./Servers/"+server.getId()+".txt");
+        File file = new File("data/servers/" + server.getId() + "/idsall.txt");
+        speedy.testFileExist(file);
         try {
 
             FileWriter writer = new FileWriter(file);
             BufferedWriter bw = new BufferedWriter(writer);
-
-            if(!file.exists()){
-                file.createNewFile();
-            }
             List <Member> ms = server.getMembers();
 
             for(Member m : ms){
@@ -106,5 +104,4 @@ public class features {
             sendMess(mess, "[Erreur syntaxe !] Syntaxe : `ur/getid <salon ou membre#0000>");
         }
     }
-
 }
