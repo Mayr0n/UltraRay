@@ -17,6 +17,9 @@ public class wordsGames {
             if(mot.equalsIgnoreCase("k")){
                 sendMess(mess, "k");
             }
+            if(mot.equalsIgnoreCase("oof")){
+                addMessEmote(mess, ":OOF:524622837953200138");
+            }
         }
 
         if(contenuMess.length() > 6 && contenuMess.substring(0,6).equals("/spawn") &&
