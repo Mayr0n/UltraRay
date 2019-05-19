@@ -19,6 +19,7 @@ public class setupFolders {
         File gen = new File("data/servers/" + server.getId() + " (" + server.getName() + ")/");
         speedy.testFolderExist(gen);
         speedy.testFolderExist(new File(gen.getPath() + "/moderation/"));
+        speedy.testFolderExist(new File(gen.getPath() + "/moderation/cooldowns/"));
         speedy.testFolderExist(new File(gen.getPath() + "/games/"));
         speedy.testFolderExist(new File(gen.getPath() + "/games/pp"));
         speedy.testFolderExist(new File(gen.getPath() + "/games/mathsplay"));
