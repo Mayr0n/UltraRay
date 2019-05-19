@@ -1,5 +1,6 @@
 package jeux;
 
+import main.speedy;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 
@@ -7,20 +8,20 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
+import static main.speedy.espace;
+import static main.speedy.sendMess;
+
 public class mathsplay {
 
     public void mathsplay(Member member, Message mess) {
 
         String contenuMess = mess.getContentDisplay();
         String[] mots = contenuMess.split(" ");
-        File playerFile = new File("data/mathsplay/" + member.getUser().getId() + ".txt");
+        File playerFile = new File(speedy.getServerFolder(mess.getGuild()) + "/games/mathsplay/" + member.getUser().getId() + ".txt");
 
         if (mots.length == 2 || mots.length == 3) {
-
             try {
-
                 BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(playerFile), StandardCharsets.UTF_8));
-
                 switch (mots[1]) {
                     case "respond":
                         reader.readLine();
@@ -50,13 +51,9 @@ public class mathsplay {
                 sendMess(mess, "Tu n'a pas créé de partie !" + espace() + "Pour en créer une, écris `ur/mathsplay new <nombreMaximal> <signe>`" + espace() +
                         "Sachant que le nombre maximal peut être au maximum 2147483647, et le signe peut être `+`, `-` ou`*`");
             }
-
         } else if(mots.length == 4 && mots[1].equals("new")){
             try {
-                if (!playerFile.exists()) {
-                    playerFile.createNewFile();
-                }
-
+                speedy.testFileExist(playerFile);
                 FileWriter writer = new FileWriter(playerFile);
                 BufferedWriter bw = new BufferedWriter(writer);
 
@@ -83,15 +80,12 @@ public class mathsplay {
                         calcul = t1 + " * " + t2;
                         break;
                 }
-
-
                 bw.write(calcul);
                 bw.newLine();
                 bw.write(Integer.toString(total));
 
                 bw.close();
                 writer.close();
-
                 sendMess(mess, "Combien font " + calcul + " ?");
             } catch(IOException e){
                 e.printStackTrace();
@@ -105,17 +99,5 @@ public class mathsplay {
         } else {
             sendMess(mess, "[Erreur] Syntaxe : `ur/mathsplay new <nombreMaximal> <signe>`" + espace() + "Sachant que le nombre maximal peut être au maximum 2147483647, et signe peut être `+`, `-` ou`*`");
         }
-
-
     }
-
-    private static void sendMess(Message mess, String contenu) {
-        mess.getChannel().sendMessage(contenu).queue();
-    }
-
-    private static String espace() {
-        return "\n" + "\n";
-    }
-
-
 }
