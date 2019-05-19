@@ -5,6 +5,8 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 import static main.speedy.espace;
@@ -19,8 +21,8 @@ public class commandes {
            case "ur/help":
                sendMess(mess, "`ur/say : Pour que @Ultra Ray dise votre message`" + espace() +
                        "`ur/joke : PARCE QUE L'HUMOUR C'EST DROLE`" + espace() +
-                       "`ur/pp info : permet d'avoir des informations sur le jeu de `pingpong` d'Ultra Ray" + espace() +
-                       "`ur/mathsplayinfo : permet d'avoir des informations sur le jeu `mathsplay` d'Ultra Ray" + espace() +
+                       "`ur/pp info : permet d'avoir des informations sur le jeu de 'pingpong' d'Ultra Ray" + espace() +
+                       "`ur/mathsplayinfo : permet d'avoir des informations sur le jeu 'mathsplay' d'Ultra Ray" + espace() +
                        "`ur/dab : DAAAAAAAAAAAAAAAAB`")
                ;
                break;
@@ -103,7 +105,7 @@ public class commandes {
                break;
            case "ur/bound":
                if(isStaff(member)){
-                   new moderation.troll().bound(member, mess, server);
+                   new moderation.troll().bound(mess, server);
                } else {
                    sendMess(mess, "Tu dois être staff pour ça !");
                }
@@ -122,10 +124,23 @@ public class commandes {
                    sendMess(mess, "Tu dois être staff pour ça !");
                }
                break;
+           case "ur/closeChannels":
+                if(member.isOwner()){
+                    new moderation.realModeration().closeChannels(server);
+                } else {
+                    sendMess(mess, "Il n'y a que le propriétaire qui peut faire ça !");
+                }
+               break;
+           case "ur/openChannels":
+               if(member.isOwner()){
+                   new moderation.realModeration().openChannels(server);
+               } else {
+                   sendMess(mess, "Il n'y a que le propriétaire qui peut faire ça !");
+               }
+               break;
        }
     }
-
     private boolean isStaff(Member member){
-        return member.hasPermission(Permission.KICK_MEMBERS);
+        return member.hasPermission(Permission.MANAGE_ROLES);
     }
 }
