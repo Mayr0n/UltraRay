@@ -6,10 +6,8 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.managers.GuildController;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static main.speedy.sendMess;
@@ -19,29 +17,32 @@ public class features {
     public void renameAll(Message mess, Guild server){
         String contenuMess = mess.getContentDisplay();
         String[] contMess = contenuMess.split(" ");
+        if(speedy.testCooldown(mess.getMember(), mess)){
+            if (contMess.length > 1) {
+                contMess[0] = "";
+                String newNick = String.join(" ", contMess);
+                List<Member> listUser = server.getMembers();
 
-        if (contMess.length > 1) {
-            contMess[0] = "";
-            String newNick = String.join(" ", contMess);
-            List<Member> listUser = server.getMembers();
-
-            for (Member m : listUser) {
-                GuildController serveradmin = server.getController();
-                if(!m.isOwner()) {
-                    serveradmin.setNickname(m, newNick).queue();
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException ee) {
-                        System.out.print("oof");
+                for (Member m : listUser) {
+                    GuildController serveradmin = server.getController();
+                    if(!m.isOwner()) {
+                        serveradmin.setNickname(m, newNick).queue();
+                        try {
+                            Thread.sleep(200);
+                        } catch (InterruptedException ee) {
+                            System.out.print("oof");
+                        }
                     }
                 }
+                sendMess(mess,"Tout le monde a été renommé en ***" + newNick + "*** !");
+                speedy.setCooldown(mess.getMember(), mess);
+            } else {
+                sendMess(mess,"[Nop !] Syntaxe : ur/renameall <rename en ?>");
             }
-            sendMess(mess,"Tout le monde a été renommé en ***" + newNick + "*** !");
         } else {
-
-            sendMess(mess,"[Nop !] Syntaxe : ur/renameall <rename en ?>");
-
+            sendMess(mess, "Il y a un cooldown sur cette commande ! Il te reste " + speedy.getCooldown(mess.getMember(), mess) + " secondes à attendre !");
         }
+
     }
     public void getIdsAll(Message mess, Guild server){
         File file = new File("data/servers/" + server.getId() + "/idsall.txt");
@@ -73,17 +74,22 @@ public class features {
     public void resetAllNames(Message mess, Guild server){
         List<Member> listUser = server.getMembers();
         GuildController serverAdmin = server.getController();
-        for (Member m : listUser) {
-            if(!m.isOwner()) {
-                serverAdmin.setNickname(m, m.getUser().getName()).queue();
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+        if(speedy.testCooldown(mess.getMember(), mess)){
+            for (Member m : listUser) {
+                if(!m.isOwner()) {
+                    serverAdmin.setNickname(m, m.getUser().getName()).queue();
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
+            sendMess(mess,"Terminé !");
+            speedy.setCooldown(mess.getMember(), mess);
+        } else {
+            sendMess(mess, "Il y a un cooldown sur cette commande ! Il te reste " + speedy.getCooldown(mess.getMember(), mess) + " secondes à attendre !");
         }
-        sendMess(mess,"Terminé !");
     }
     public void getID(Message mess, Guild server){
         String contenuMess = mess.getContentDisplay();
@@ -102,6 +108,33 @@ public class features {
 
         } else {
             sendMess(mess, "[Erreur syntaxe !] Syntaxe : `ur/getid <salon ou membre#0000>");
+        }
+    }
+    public void countMessages(Guild server) {
+        System.out.println();
+        File counterFolder = new File(speedy.getServerFolder(server) + "moderation/counters/");
+        File counter = new File(speedy.getServerFolder(server) + "moderation/counters/" + speedy.getDate().toString().substring(0,10) + ".txt");
+        speedy.testFolderExist(counterFolder);
+        speedy.testFileExist(counter);
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(counter), StandardCharsets.UTF_8));
+            String nb = reader.readLine();
+            FileWriter writer = new FileWriter(counter);
+            BufferedWriter bw = new BufferedWriter(writer);
+            if(nb == null){
+                nb = "1";
+                bw.write(nb);
+            } else {
+                int i = Integer.parseInt(nb);
+                i++;
+                nb = Integer.toString(i);
+                bw.write(nb);
+            }
+            bw.close();
+            writer.close();
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
