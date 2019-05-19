@@ -94,27 +94,35 @@ public class troll {
             sendMess(mess, "Personne n'est bound !");
         }
     }
-    public void spam(Message mess) throws NumberFormatException{
-        String contenuMess = mess.getContentDisplay();
-        String[] mots = contenuMess.split(" ");
-        List<Member> mentionned = mess.getMentionedMembers();
-        if(mots.length == 3 && mentionned.size() == 1){
-            int nb = Integer.parseInt(mots[1]);
-            if(!(nb > 20)){
-                for(int i = 0 ; i < nb ; i++){
-                    sendMess(mess, "<@" + mentionned.get(0).getUser().getId() + ">");
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+    public void spam(Message mess){
+        try {
+            String contenuMess = mess.getContentDisplay();
+            String[] mots = contenuMess.split(" ");
+            List<Member> mentionned = mess.getMentionedMembers();
+            if(speedy.testCooldown(mess.getMember(), mess)){
+                if (mots.length == 3 && mentionned.size() == 1) {
+                    int nb = Integer.parseInt(mots[1]);
+                    if (!(nb > 20)) {
+                        for (int i = 0; i < nb; i++) {
+                            sendMess(mess, "<@" + mentionned.get(0).getUser().getId() + ">");
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        sendMess(mess, ":)");
+                    } else {
+                        sendMess(mess, "Ça fait un peu trop de messages :sweat_smile: (20 maximum)");
                     }
+                    speedy.setCooldown(mess.getMember(), mess);
+                } else {
+                    sendMess(mess, "[Erreur] Syntaxe : `ur/spam <nb de fois> <membre>");
                 }
-                sendMess(mess, ":)");
             } else {
-                sendMess(mess, "Ça fait un peu trop de messages :sweat_smile:");
+                sendMess(mess, "Il y a un cooldown sur cette commande ! Il te reste " + speedy.getCooldown(mess.getMember(), mess) + " secondes à attendre !");
             }
-
-        } else {
+        } catch(NumberFormatException e){
             sendMess(mess, "[Erreur] Syntaxe : `ur/spam <nb de fois> <membre>");
         }
     }
