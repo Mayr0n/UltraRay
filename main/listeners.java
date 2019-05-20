@@ -56,5 +56,6 @@ public class listeners extends ListenerAdapter {
         } catch(IOException ee){
             ee.printStackTrace();
         }
+        new talkness.politeness().politenessPrivate(e.getMessage());
     }
 }
