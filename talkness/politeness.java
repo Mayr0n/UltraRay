@@ -19,6 +19,14 @@ public class politeness {
             alright(mess);
         }
     }
+    public void  politenessPrivate(Message mess){
+        String contenuMess = mess.getContentDisplay();
+        if (contenuMess.contains("Coucou") || contenuMess.contains("Salut") || contenuMess.contains("salut") || contenuMess.contains("coucou")) {
+            greetings(mess);
+        }if (contenuMess.contains("ça va")){
+            alright(mess);
+        }
+    }
     private void greetings(Message mess){
         Random r = new Random();
         int i = r.nextInt(4);
