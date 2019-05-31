@@ -6,8 +6,10 @@ import java.io.File;
 
 public class setupFolders {
 
-    public void setupFolders(Guild server){
+    public void setupFolders(Guild server) throws NullPointerException{
         File folderGen = new File("data/servers/");
+        speedy.testFolderExist(new File("data/"));
+        speedy.testFolderExist(folderGen);
         File[] folders = folderGen.listFiles();
 
         for(File folder : folders){
@@ -20,10 +22,13 @@ public class setupFolders {
         speedy.testFolderExist(gen);
         speedy.testFolderExist(new File(gen.getPath() + "/moderation/"));
         speedy.testFolderExist(new File(gen.getPath() + "/moderation/cooldowns/"));
+        speedy.testFolderExist(new File(gen.getPath() + "/moderation/messages/"));
         speedy.testFolderExist(new File(gen.getPath() + "/games/"));
         speedy.testFolderExist(new File(gen.getPath() + "/games/pp"));
         speedy.testFolderExist(new File(gen.getPath() + "/games/mathsplay"));
         speedy.testFolderExist(new File(gen.getPath() + "/leaderboards/"));
         speedy.testFolderExist(new File(gen.getPath() + "/leaderboards/pp"));
     }
+
+
 }
