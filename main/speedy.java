@@ -1,15 +1,22 @@
-package main;
+package ur.nyroma.main;
 
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.*;
 
+import java.awt.*;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class speedy {
     public static void sendMess(MessageChannel channel, String contenu){
         channel.sendMessage(contenu).queue();
+    }
+    public static void deleteMess(Message mess){
+        mess.delete().queue();
     }
     public static void sendPrivMess(Message mess, String id, String message){
         mess.getGuild().getMemberById(id).getUser().openPrivateChannel().queue(
@@ -22,9 +29,6 @@ public class speedy {
         );
     }
     public static void addMessEmote(Message mess, String code){ mess.addReaction(code).queue(); }
-    public static void delete(Message mess){
-        mess.delete().queue();
-    }
     public static String espace() {
         return "\n" + "\n";
     }
@@ -49,20 +53,61 @@ public class speedy {
     public static String getServerFolder(Guild server){
         return "data/servers/" + server.getId() + " (" + server.getName() + ")/";
     }
-    public static void sleep(int amount){
+    public static TextChannel getChannelByName(Guild server, String name){
+        TextChannel c = server.getTextChannels().get(0);
+        for(TextChannel ch : server.getTextChannels()){
+            if(ch.getName().equals(name)){
+                c = ch;
+            }
+        }
+        return c;
+    }
+    public static boolean fileHas(File file, String txt){
         try {
-            Thread.sleep(amount);
-        } catch (InterruptedException e) {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            List<String> lines = reader.lines().collect(Collectors.toList());
+            reader.close();
+            if(lines.contains(txt)){
+                return true;
+            } else {
+                return false;
+            }
+        } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
     }
-
-    public static String getDateDetails(){
-        String[] date = speedy.getDate().toString().substring(4,9).split(" ");
-        String[] time = speedy.getDate().toString().substring(12,19).split(":");
-        int[] seconds = {Integer.parseInt(time[0]),Integer.parseInt(time[1]),Integer.parseInt(time[2])};
-        int secondes = seconds[0]*3600 + seconds[1]*60 + seconds[2];
-        return secondes + " " + date[0] + " " + date[1];
+    public static List<String> getFileContent(File file){
+        List<String> lines = new ArrayList<>();
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String line = reader.readLine();
+            while(line != null){
+                lines.add(line);
+                line = reader.readLine();
+            }
+            reader.close();
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+        return lines;
+    }
+    public static void writeInFile(File file, String txt, boolean erase){
+        testFileExist(file);
+        try {
+            FileWriter fw;
+            if (erase) {
+                fw = new FileWriter(file, false);
+            } else {
+                fw = new FileWriter(file, true);
+            }
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(txt);
+            bw.close();
+            fw.close();
+        } catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
 }
