@@ -1,62 +1,69 @@
-package talkness;
+package ur.nyroma.talk;
 
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageChannel;
+import ur.nyroma.main.speedy;
 
 import java.util.Random;
 
-import static main.speedy.sendMess;
-
 public class politeness {
 
-    public void politeness(Message mess, Guild server){
-        String contenuMess = mess.getContentDisplay();
-        if (contenuMess.contains("Coucou") || contenuMess.contains("Salut") || contenuMess.contains("salut") || contenuMess.contains("coucou")) {
-            greetings(mess);
+    public void politeness(Message mess, Guild server) {
+        String txt = mess.getContentRaw();
+
+        if (txt.contains("Coucou") || txt.contains("Salut") || txt.contains("salut") || txt.contains("coucou")) {
+            greetings(mess.getChannel());
         }
 
-        if (contenuMess.contains("ça va") && mess.getMentionedUsers().contains(server.getJDA().getSelfUser())){
-            alright(mess);
+        if (txt.contains("ça va") && mess.getMentionedUsers().contains(server.getJDA().getSelfUser())) {
+            alright(mess.getChannel());
         }
     }
-    public void  politenessPrivate(Message mess){
-        String contenuMess = mess.getContentDisplay();
-        if (contenuMess.contains("Coucou") || contenuMess.contains("Salut") || contenuMess.contains("salut") || contenuMess.contains("coucou")) {
-            greetings(mess);
-        }if (contenuMess.contains("ça va")){
-            alright(mess);
+
+    public void politenessPrivate(Message mess) {
+        String txt = mess.getContentRaw();
+
+        if (txt.contains("Coucou") || txt.contains("Salut") || txt.contains("salut") || txt.contains("coucou")) {
+            greetings(mess.getChannel());
+        }
+        if (txt.contains("ça va")) {
+            alright(mess.getChannel());
         }
     }
-    private void greetings(Message mess){
+
+    private void greetings(MessageChannel channel) {
         Random r = new Random();
         int i = r.nextInt(4);
-
         switch (i) {
-
             case 1:
-                sendMess(mess,"Yooo");
+                speedy.sendMess(channel, "Yooo");
                 break;
             case 2:
-                sendMess(mess,"Salut !");
+                speedy.sendMess(channel, "Salut !");
                 break;
             case 3:
-                sendMess(mess,"Coucouu");
+                speedy.sendMess(channel, "Coucouuuu");
                 break;
             case 4:
-                sendMess(mess,"Wsh");
+                speedy.sendMess(channel, "Wsh wsh canne à pêche");
                 break;
-
         }
     }
-    private void alright(Message mess){
+
+    private void alright(MessageChannel channel) {
         Random r = new Random();
         int i = r.nextInt(3);
-
         switch (i) {
-            case 1: sendMess(mess,"Super et toi ?"); break;
-            case 2:sendMess(mess,"Bien, comme toujours :D et toi ?"); break;
-            case 3: sendMess(mess,"Trkl et toi ?"); break;
+            case 1:
+                speedy.sendMess(channel, "Super et toi ?");
+                break;
+            case 2:
+                speedy.sendMess(channel, "Bien, comme toujours :D et toi ?");
+                break;
+            case 3:
+                speedy.sendMess(channel, "Trkl et toi ?");
+                break;
         }
     }
-
 }
