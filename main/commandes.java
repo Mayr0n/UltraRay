@@ -1,27 +1,32 @@
-package main;
+package ur.nyroma.main;
 
-import moderation.features;
+import ur.nyroma.jeux.mathsplay;
+import ur.nyroma.moderation.features;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
+import ur.nyroma.jeux.pingpong;
+import ur.nyroma.moderation.realModeration;
+import ur.nyroma.moderation.troll;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static main.speedy.*;
+import static ur.nyroma.main.speedy.*;
 
 public class commandes {
     public static String prefix = "ur/";
-    public void doCommand(Message mess, Guild server, Member member) {
+    public void doCommand(Message mess, Guild server) {
         String txtMess = mess.getContentDisplay();
         MessageChannel channel = mess.getChannel();
+        Member member = mess.getMember();
         String[] mots = txtMess.split(" ");
         String[] normalCommands = {"help", "say", "joke", "pp", "dab", "mathsPlay"};
-        String[] staffCommands = {"kick", "renameAll", "bound", "unbound", "spam"};
+        String[] staffCommands = {"renameAll", "bound", "unbound", "spam"};
         String[] ownerCommands = {"resetAllNames", "closeChannels", "openChannels", "sendMpAll", "delete", "renameAll"};
-        String[] mayCommands = {"idsAll", "getId", "sendMp", "getMessages", "getMessagesDel"};
+        String[] mayCommands = {"idsAll", "getId", "sendMp", "shutdown"};
         List<String> nCommToTest = new ArrayList<>();
         List<String> sCommToTest = new ArrayList<>();
         List<String> oCommToTest = new ArrayList<>();
@@ -54,16 +59,16 @@ public class commandes {
                         new features().say(mots, mess);
                         break;
                     case 2:
-                        new features().tellJoke(channel);
+                        new features().tellJoke(mess);
                         break;
                     case 3:
-                        new jeux.pingpong().pingpong(mess, member);
+                        new pingpong().pingpong(mess);
                         break;
                     case 4:
                         sendMess(channel, "https://tenor.com/view/dab-dab-problem-dab-dance-gif-5412848");
                         break;
                     case 5:
-                        new jeux.mathsplay().mathsplay(member, mess);
+                        new mathsplay().mathsplay(member, mess);
                         break;
                 }
             }
@@ -72,19 +77,16 @@ public class commandes {
             if(mots[0].equals(sCommToTest.get(i)) && member.hasPermission(Permission.MANAGE_ROLES)){
                 switch(i){
                     case 0:
-                        new moderation.realModeration().kick(mess, server);
+                        new features().renameAll(mess);
                         break;
                     case 1:
-                        new moderation.features().renameAll(mess, server);
+                        new troll().bound(mess);
                         break;
                     case 2:
-                        new moderation.troll().bound(mess, server);
+                        new troll().unbound(mess);
                         break;
                     case 3:
-                        new moderation.troll().unbound(mess);
-                        break;
-                    case 4:
-                        new moderation.troll().spam(mess);
+                        new troll().spam(mess);
                         break;
                 }
             }
@@ -93,22 +95,22 @@ public class commandes {
             if (mots[0].equals(oCommToTest.get(i)) && member.isOwner()) {
                 switch (i){
                     case 0:
-                        new moderation.features().resetAllNames(server);
+                        new features().resetAllNames(server);
                         break;
                     case 1:
-                        new moderation.realModeration().closeChannels(server);
+                        new realModeration().closeChannels(server);
                         break;
                     case 2:
-                        new moderation.realModeration().openChannels(server);
+                        new realModeration().openChannels(server);
                         break;
                     case 3:
-                        new moderation.realModeration().sendMPall(mess);
+                        new realModeration().sendMPall(mess);
                         break;
                     case 4:
-                        new moderation.realModeration().delete(channel, Integer.parseInt(mots[1]));
+                        new realModeration().delete(channel, Integer.parseInt(mots[1]));
                         break;
                     case 5:
-                        new moderation.features().renameAll(mess, server);
+                        new features().renameAll(mess);
                 }
                 sendPrivMess(mess, member.getUser().getId(), "Terminé !");
             }
@@ -117,21 +119,20 @@ public class commandes {
             if(mots[0].equals(mCommToTest.get(i)) && member.getUser().getId().equals(idMay)){
                 switch(i){
                     case 0:
-                        new moderation.features().getIdsAll(server);
+                        new features().getIdsAll(server);
                         break;
                     case 1:
-                        new moderation.features().getID(mess);
+                        new features().getID(mess);
                         break;
                     case 2:
-                        new moderation.features().sendMP(mess);
+                        new features().sendMP(mess);
                         break;
                     case 3:
-                        new moderation.features().getMessagesInChannel(channel, server);
-                        break;
-                    case 4:
-                        new moderation.features().getMessagesInChannelD(channel, server, Integer.parseInt(mots[1]));
+                        speedy.sendMess(channel,"Bip boup.. boup.... bip..........");
+                        server.getJDA().shutdown();
                 }
             }
         }
+        speedy.deleteMess(mess);
     }
 }
