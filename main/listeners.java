@@ -1,18 +1,22 @@
-package main;
+package ur.nyroma.main;
 
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import ur.nyroma.jeux.pingpong;
+import ur.nyroma.moderation.features;
+import ur.nyroma.moderation.realModeration;
+import ur.nyroma.moderation.troll;
+import ur.nyroma.talk.politeness;
+import ur.nyroma.talk.haha;
 
-import java.io.*;
 import java.util.List;
 import java.util.Random;
 
-import static main.speedy.getDate;
-
 public class listeners extends ListenerAdapter {
+    private Guild netServer;
 
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
@@ -21,51 +25,46 @@ public class listeners extends ListenerAdapter {
 
         if (!e.getAuthor().isBot() && e.getGuild() != null) {
             Message mess = e.getMessage();
-            String contenuMess = mess.getContentDisplay();
+            String txt = mess.getContentRaw();
             Guild server = e.getGuild();
-            MessageChannel channel = mess.getChannel();
-
-            if(contenuMess.contains("@someone")){
+            TextChannel channel = mess.getTextChannel();
+            if(server.getOwner().getUser().getId().equalsIgnoreCase(speedy.idMay)){
+                this.netServer = server;
+            }
+            if(txt.contains("@someone")){
                 List<Member> members = server.getMembers();
                 speedy.sendMess(channel, "<@" + members.get(new Random().nextInt(members.size())).getUser().getId() + ">");
             }
 
-            if (contenuMess.length() > 3 && contenuMess.substring(0, 3).equals(commandes.prefix)) {
-                new commandes().doCommand(mess, server, e.getMember());
+            if (txt.length() > 3 && txt.substring(0, 3).equals(commandes.prefix)) {
+                new commandes().doCommand(mess, server);
             }
-            if (contenuMess.equalsIgnoreCase("ping")) {
-                new jeux.pingpong().ping(mess, server);
+            if (txt.equalsIgnoreCase("ping")) {
+                new pingpong().ping(mess);
             }
 
-            new talkness.wordsGames().test(mess);
-            new talkness.politeness().politeness(mess, server);
-            new moderation.realModeration().censure(server, mess, e.getAuthor());
-            new moderation.troll().testBound(e.getMember(), mess);
-            new moderation.features().countMessages(server);
+            new haha().test(mess);
+            new politeness().politeness(mess, server);
+            new realModeration().censure(server, mess, e.getAuthor());
+            new troll().testBound(mess);
+            new features().countMessages(server);
         }
     }
     @Override
     public void onPrivateMessageReceived(PrivateMessageReceivedEvent e){
-        File privateMess = new File("data/privateMessages.txt");
-        if(!e.getAuthor().equals(e.getJDA().getSelfUser())) {
-            try {
-                if (!privateMess.exists()) {
-                    privateMess.createNewFile();
-                }
-                FileWriter writer = new FileWriter(privateMess, true);
-                PrintWriter pw = new PrintWriter(writer);
-                pw.println(e.getAuthor().getName() + "#" + e.getAuthor().getDiscriminator() + " (" + e.getAuthor().getId() + ") " +
-                        " /// date : " + speedy.getDate() + " /// contenu du message : " + e.getMessage().getContentDisplay());
-                pw.close();
-                writer.close();
-            } catch (IOException ee) {
-                ee.printStackTrace();
-            }
-            new talkness.politeness().politenessPrivate(e.getMessage());
+        User u = e.getAuthor();
+        Message mess = e.getMessage();
+        if(!u.equals(e.getJDA().getSelfUser())) {
+            String message =
+                    u.getName() + "#" + u.getDiscriminator() + " (<@" + u.getId()+ ">) \n" +
+                    "Date : " + speedy.getDate() + "\n" +
+                    "Message : " + mess.getContentRaw();
+            speedy.sendMess(speedy.getChannelByName(netServer, "mps"), ">>> " + message);
+            new politeness().politenessPrivate(e.getMessage());
         }
     }
     @Override
     public void onGuildMessageUpdate(GuildMessageUpdateEvent e) {
-        new moderation.realModeration().censure(e.getGuild(), e.getMessage(), e.getAuthor());
+        new realModeration().censure(e.getGuild(), e.getMessage(), e.getAuthor());
     }
 }
