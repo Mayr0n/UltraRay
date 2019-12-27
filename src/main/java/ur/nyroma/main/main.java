@@ -12,7 +12,7 @@ public class main {
 
     public static void main(String[] args){
         JDABuilder builder = new JDABuilder(AccountType.BOT);
-        builder.setToken("NTQ4NTA3OTYyMzc4MDI3MDM5.XNLk5g.XK9wt5OSM8x4JS1wfPu8ffDlmDY");
+        builder.setToken("");
         builder.setGame(Game.playing("https://discord.gg/9VfbD6d"));
         builder.addEventListener(new listeners());
         try {
