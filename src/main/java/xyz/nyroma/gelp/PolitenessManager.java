@@ -1,22 +1,19 @@
-package ur.nyroma.talk;
-
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageChannel;
-import ur.nyroma.main.speedy;
+package xyz.nyroma.gelp;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import xyz.nyroma.main.speedy;
 
 import java.util.Random;
 
-public class polite {
+public class PolitenessManager {
 
-    public void bePolite(Message mess) {
+    public void build(Message mess) {
         String txt = mess.getContentRaw();
         for(String mot : txt.split(" ")){
             if(mot.equalsIgnoreCase("coucou") || mot.equalsIgnoreCase("salut")){
                 greetings(mess.getChannel());
             }
         }
-
         if (txt.contains("ça va") && mess.getMentionedUsers().contains(mess.getGuild().getJDA().getSelfUser())) {
             alright(mess.getChannel());
         }

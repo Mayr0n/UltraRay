@@ -1,15 +1,23 @@
-package ur.nyroma.main;
+package xyz.nyroma.main;
 
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.*;
 
-import java.awt.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class speedy {
+    public static boolean isStaff(Member member) throws SpeedyException {
+        if(!(member == null)) {
+            return member.hasPermission(Permission.KICK_MEMBERS);
+        } else {
+            throw new SpeedyException("Ah.");
+        }
+    }
+
     public static void sendMess(MessageChannel channel, String contenu){
         channel.sendMessage(contenu).queue();
     }
@@ -54,19 +62,18 @@ public class speedy {
     public static String getServerFolder(Guild server){
         return "data/servers/" + server.getId() + " (" + server.getName() + ")/";
     }
-    public static TextChannel getChannelByName(Guild server, String name){
-        TextChannel c = server.getTextChannels().get(0);
+    public static TextChannel getChannelByName(Guild server, String name) throws SpeedyException {
         for(TextChannel ch : server.getTextChannels()){
             if(ch.getName().equals(name)){
-                c = ch;
+                return ch;
             }
         }
-        return c;
+        throw new SpeedyException("Il n'existe pas de salon avec ce nom.");
     }
     public static boolean fileHas(File file, String txt, boolean precise){
         boolean found = false;
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
             List<String> lines = reader.lines().collect(Collectors.toList());
             reader.close();
             if(precise){
@@ -89,7 +96,7 @@ public class speedy {
     public static List<String> getFileContent(File file){
         List<String> lines = new ArrayList<>();
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
             String line = reader.readLine();
             while(line != null){
                 lines.add(line);
@@ -104,16 +111,16 @@ public class speedy {
     public static boolean writeInFile(File file, String txt, boolean erase){
         testFileExist(file);
         try {
-            FileWriter fw;
+            OutputStreamWriter osw;
             if (erase) {
-                fw = new FileWriter(file, false);
+                osw = new OutputStreamWriter(new FileOutputStream(file, true), StandardCharsets.UTF_8);
             } else {
-                fw = new FileWriter(file, true);
+                osw = new OutputStreamWriter(new FileOutputStream(file, false), StandardCharsets.UTF_8);
             }
-            BufferedWriter bw = new BufferedWriter(fw);
+            BufferedWriter bw = new BufferedWriter(osw);
             bw.write(txt);
             bw.close();
-            fw.close();
+            osw.close();
             return true;
         } catch(IOException e){
             e.printStackTrace();

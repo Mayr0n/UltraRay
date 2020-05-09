@@ -1,6 +1,6 @@
-package ur.nyroma.main;
+package xyz.nyroma.main;
 
-import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageChannel;
 
 public class compteur implements Runnable {
     private MessageChannel channel;
