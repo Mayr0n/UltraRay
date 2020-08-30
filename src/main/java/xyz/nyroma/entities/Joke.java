@@ -1,4 +1,4 @@
-package xyz.nyroma.gelp;
+package xyz.nyroma.entities;
 
 public class Joke {
     private String title;
@@ -7,7 +7,6 @@ public class Joke {
     public Joke(String title, String joke){
         this.title = title;
         this.joke = joke;
-        new JokeCache().add(this);
     }
 
     public String getJoke() {

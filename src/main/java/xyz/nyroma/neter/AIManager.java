@@ -3,8 +3,7 @@ package xyz.nyroma.neter;
 import fr.may.processus.DataSorter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import xyz.nyroma.main.SpeedyException;
-import xyz.nyroma.main.speedy;
+import xyz.nyroma.main.MainUtils;
 
 import java.util.Hashtable;
 import java.util.Set;
@@ -22,14 +21,10 @@ public class AIManager {
             Set<String> set = added.keySet();
             for(String s : set){
                 if(added.get(s)){
-                    TextChannel channel;
-                    try {
-                        channel = speedy.getChannelByName(server, "ia_logs");
-                    } catch(SpeedyException e){
-                        channel = server.createTextChannel("ia_logs").complete();
-                        channel.getManager().setTopic("Ici seront répertoriés les logs de l'IA.").queue();
-                    }
-                    speedy.sendMess(channel, "**" + s + "** a été enregistré.");
+                    TextChannel channel = MainUtils.getChannelByName(server, "ia_logs").isPresent()
+                            ? MainUtils.getChannelByName(server, "ia_logs").get() : server.createTextChannel("ia_logs").complete();
+                    channel.getManager().setTopic("Ici seront répertoriés les logs de l'IA.").queue();
+                    MainUtils.sendMess(channel, "**" + s + "** a été enregistré.");
                 }
             }
         });

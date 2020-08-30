@@ -1,23 +1,24 @@
-package xyz.nyroma.main;
+package xyz.nyroma.entities;
 
 import net.dv8tion.jda.api.entities.MessageChannel;
+import xyz.nyroma.main.MainUtils;
 
-public class compteur implements Runnable {
+public class Compteur implements Runnable {
     private MessageChannel channel;
-    public compteur(MessageChannel channel){
+    public Compteur(MessageChannel channel){
         this.channel = channel;
     }
 
     @Override
     public void run() {
         try {
-            speedy.sendMess(this.channel, "3");
+            MainUtils.sendMess(this.channel, "3");
             Thread.sleep(1000);
-            speedy.sendMess(this.channel, "2");
+            MainUtils.sendMess(this.channel, "2");
             Thread.sleep(1000);
-            speedy.sendMess(this.channel,"1");
+            MainUtils.sendMess(this.channel,"1");
             Thread.sleep(200);
-            speedy.sendMess(this.channel, "go");
+            MainUtils.sendMess(this.channel, "go");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
