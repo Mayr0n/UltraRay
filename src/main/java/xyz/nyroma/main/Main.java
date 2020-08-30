@@ -17,7 +17,7 @@ public class Main {
     private static JDA bot;
 
     public static void main(String[] args) {
-        JDABuilder builder = JDABuilder.createDefault("NTQ4NTA3OTYyMzc4MDI3MDM5.Xrb18g.IV3aGYW8cOjBvqlfC_Xb29PyrYs");
+        JDABuilder builder = JDABuilder.createDefault("");
         builder.setActivity(Activity.watching("https://discord.gg/9VfbD6d"));
         builder.addEventListeners(new MainListeners());
         try {
