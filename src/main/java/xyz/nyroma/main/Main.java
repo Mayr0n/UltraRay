@@ -28,6 +28,4 @@ public class Main {
         System.out.println("Yoooooooooo je suis co !");
         ServerInfoCache.setup(new File("data/"));
     }
-
-
 }
