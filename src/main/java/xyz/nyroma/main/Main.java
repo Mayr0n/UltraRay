@@ -21,7 +21,10 @@ public class Main {
     private static JDA bot;
 
     public static void main(String[] args) {
-        JDABuilder builder = JDABuilder.createDefault("");
+        JDABuilder builder = JDABuilder.createDefault("")
+                .setChunkingFilter(ChunkingFilter.ALL)
+                .setMemberCachePolicy(MemberCachePolicy.ALL)
+                .enableIntents(GatewayIntent.GUILD_MEMBERS);
         builder.setActivity(Activity.watching("https://discord.gg/9VfbD6d"));
         builder.addEventListeners(new MainListeners());
         try {

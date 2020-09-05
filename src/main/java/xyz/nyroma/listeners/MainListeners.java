@@ -8,11 +8,13 @@ import net.dv8tion.jda.api.events.guild.update.GuildUpdateNameEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import xyz.nyroma.banks.Bank;
+import xyz.nyroma.banks.BankCache;
+import xyz.nyroma.banks.TransactionType;
 import xyz.nyroma.caches.ServerInfoCache;
 import xyz.nyroma.entities.Compteur;
-import xyz.nyroma.entities.ServerInfo;
 import xyz.nyroma.entities.Joke;
-import xyz.nyroma.main.Main;
+import xyz.nyroma.entities.ServerInfo;
 import xyz.nyroma.main.MainUtils;
 
 import java.io.File;
@@ -32,9 +34,9 @@ public class MainListeners extends ListenerAdapter {
     private List<Guild> servers = new ArrayList<>();
 
     @Override
-    public void onGuildUpdateName(GuildUpdateNameEvent e){
+    public void onGuildUpdateName(GuildUpdateNameEvent e) {
         Guild server = e.getGuild();
-        if(ServerInfoCache.get(server.getIdLong()).isPresent()){
+        if (ServerInfoCache.get(server.getIdLong()).isPresent()) {
             ServerInfo info = ServerInfoCache.get(server.getIdLong()).get();
             info.setServerName(server.getName());
         }
@@ -54,17 +56,39 @@ public class MainListeners extends ListenerAdapter {
             Guild server = e.getGuild();
             MessageChannel channel = mess.getChannel();
             Member member = mess.getMember();
+            Bank bank = BankCache.get(member.getUser().getId()).isPresent() ?
+                    BankCache.get(member.getUser().getId()).get() :
+                    new Bank(member.getUser().getId());
+
+            float xp = 0;
+            switch(new Random().nextInt(4)){
+                case 0:
+                    xp = 0.001f;
+                    break;
+                case 1:
+                    xp = 0.005f;
+                    break;
+                case 2:
+                    xp = 0.0075f;
+                    break;
+                case 3:
+                    xp = 0.01f;
+                    break;
+            }
+            bank.add(xp, TransactionType.STATE_ADD);
+
             String[] args = txt.split(" ");
-            if(!servers.contains(server)){
+
+            if (!servers.contains(server)) {
                 launchThreads(server);
                 servers.add(server);
             }
 
-            if(txt.equals("test ici") && member.getId().equals(MainUtils.idMay)){
+            if (txt.equals("test ici") && member.getId().equals(MainUtils.idMay)) {
                 if (MainUtils.getChannelByName(server, "cantine").isPresent()) {
                     MainUtils.sendMess(channel, "Salon cantine détecté.");
                     GuildChannel channel2 = MainUtils.getChannelByName(server, "cantine").get();
-                    if(channel2.getPermissionOverride(server.getRoleById(server.getId())) != null){
+                    if (channel2.getPermissionOverride(server.getRoleById(server.getId())) != null) {
                         channel2.getPermissionOverride(server.getRoleById(server.getId())).delete().queue();
                     }
                     channel2.createPermissionOverride(server.getRoleById(server.getId())).setDeny(Permission.MESSAGE_WRITE).queue();
@@ -240,6 +264,7 @@ public class MainListeners extends ListenerAdapter {
         Member member = mess.getMember();
         MessageChannel channel = mess.getChannel();
         Guild server = mess.getGuild();
+        System.out.println(cmd);
 
         if (args.length > 1) {
             if (cmd.equals("bound") && MainUtils.isStaff(member)) {
@@ -256,8 +281,8 @@ public class MainListeners extends ListenerAdapter {
                         StringBuilder sb = new StringBuilder();
                         sb.append("```Liste des bounds :\n");
                         for (long id : serverInfo.getBounds()) {
-                            if(MainUtils.getMemberByID(server, id).isPresent()){
-                                Member m = MainUtils.getMemberByID(server, id).get();
+                            if (server.getMemberById(id) != null) {
+                                Member m = server.getMemberById(id);
                                 sb.append("- ").append(m.getUser().getName()).append("#").append(m.getUser().getDiscriminator()).append("\n");
                             }
                         }
@@ -400,7 +425,8 @@ public class MainListeners extends ListenerAdapter {
                 rename.setDaemon(true);
                 rename.start();
                 return true;
-            } else if (cmd.equals("bl") && MainUtils.isStaff(member)) {
+            }
+            else if (cmd.equals("bl") && MainUtils.isStaff(member)) {
                 if (args.length > 2) {
                     switch (args[1]) {
                         case "add":
@@ -430,7 +456,100 @@ public class MainListeners extends ListenerAdapter {
                         return false;
                     }
                 }
-            } else {
+            }
+            else if(cmd.equals("bank")){
+                List<Member> mentionned = mess.getMentionedMembers();
+                if(args[1].equals("list")){
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(">>> :money_with_wings: **Banks :**").append("\n").append("\n");
+                    System.out.println(BankCache.getBanks().size());
+                    for (Bank bank : BankCache.getBanks()) {
+                        System.out.println(bank.getPlayer());
+                        if (server.getMemberById(bank.getPlayer()) != null) {
+                            Member m = server.getMemberById(bank.getPlayer());
+                            sb.append(":small_blue_diamond: **").append(m.getUser().getName()).append("#").append(m.getUser().getDiscriminator()).append(" (")
+                                    .append(bank.getPlayer()).append(")** : ").append(bank.getAmount()).append(" Nyr \n");
+                        } else {
+                            sb.append(":small_blue_diamond: **").append("fdp").append("#").append("0000").append(" (")
+                                    .append(bank.getPlayer()).append(")** : ").append(bank.getAmount()).append(" Nyr \n");
+                        }
+                    }
+                    MainUtils.sendMess(channel, sb.toString());
+                    return true;
+                } else if(args[1].equals("get")){
+                    if(mentionned.size() == 1){
+                        User u = mentionned.get(0).getUser();
+                        Bank bank = BankCache.get(u.getId()).isPresent() ? BankCache.get(u.getId()).get() : new Bank(u.getId());
+                        MainUtils.sendMess(channel, ">>> **__Banque :__** \n" +
+                                ":key: **Propriétaire :** " + u.getName() + "#" + u.getDiscriminator() + " (" + bank.getPlayer() + ") \n" +
+                                ":moneybag: **Montant :** " + bank.getAmount() + " Nyr\n" +
+                                ":chart_with_upwards_trend: **Nombre de transactions :** " + bank.getTransactions().size());
+                    } else {
+                        MainUtils.sendMess(channel, "Il ne faut mentionner qu'une seule personne !");
+                    }
+                    return true;
+                } else if(args[1].equals("add") && member.isOwner()){
+                    if(mentionned.size() == 1){
+                        if(args.length == 4){
+                            User u = mentionned.get(0).getUser();
+                            Bank bank = BankCache.get(u.getId()).isPresent() ? BankCache.get(u.getId()).get() : new Bank(u.getId());
+                            float amount = Float.parseFloat(args[3]);
+                            bank.add(amount, TransactionType.STATE_ADD);
+                            MainUtils.sendMess(channel, amount + " Nyr ont été virés vers le compte de " + u.getName() + ".");
+                        } else {
+                            MainUtils.sendMess(channel, "**Syntaxe :** `ur/bank add <mention> <montant>`");
+                        }
+                    } else {
+                        MainUtils.sendMess(channel, "Il ne faut mentionner qu'une seule personne !");
+                    }
+                    return true;
+                } else if(args[1].equals("send")){
+                    if(mentionned.size() == 1){
+                        if(args.length == 4){
+                            User u = mentionned.get(0).getUser();
+                            Bank receiverBank = BankCache.get(u.getId()).isPresent() ? BankCache.get(u.getId()).get() : new Bank(u.getId());
+                            Bank senderBank = BankCache.get(member.getUser().getId()).isPresent() ? BankCache.get(member.getUser().getId()).get() : new Bank(member.getUser().getId());
+                            float amount = Float.parseFloat(args[3]);
+                            if(senderBank.getAmount() >= amount){
+                                receiverBank.add(amount, TransactionType.PLAYER_ADD);
+                                senderBank.remove(amount, TransactionType.PLAYER_REMOVE);
+                                MainUtils.sendMess(channel, amount + " Nyr ont été débités de votre compte.");
+                                MainUtils.sendMess(channel, amount + " Nyr ont été virés vers le compte de " + u.getName() + ".");
+                            } else {
+                                MainUtils.sendMess(channel, "Vous n'avez pas assez d'argent dans votre banque.");
+                            }
+                        } else {
+                            MainUtils.sendMess(channel, "**Syntaxe :** `ur/bank send <mention> <montant>`");
+                        }
+                    } else {
+                        MainUtils.sendMess(channel, "Il ne faut mentionner qu'une seule personne !");
+                    }
+                    return true;
+                } else if(args[1].equals("remove") && member.isOwner()){
+                    if(mentionned.size() == 1){
+                        if(args.length == 4){
+                            User u = mentionned.get(0).getUser();
+                            Bank receiverBank = BankCache.get(u.getId()).isPresent() ? BankCache.get(u.getId()).get() : new Bank(u.getId());
+                            float amount = Float.parseFloat(args[3]);
+                            if(receiverBank.getAmount() >= amount){
+                                receiverBank.remove(amount, TransactionType.STATE_REMOVE);
+                                MainUtils.sendMess(channel, amount + " Nyr ont été débités du compte de " + u.getName() + ".");
+                            } else {
+                                MainUtils.sendMess(channel, "Vous n'avez pas assez d'argent dans votre banque.");
+                            }
+                        } else {
+                            MainUtils.sendMess(channel, "**Syntaxe :** `ur/bank remove <mention> <montant>`");
+                        }
+                    } else {
+                        MainUtils.sendMess(channel, "Il ne faut mentionner qu'une seule personne !");
+                    }
+                    return true;
+                } else {
+                    MainUtils.sendMess(channel, "**Syntaxe :** `ur/bank <list:get:add:remove:send>`");
+                    return false;
+                }
+            }
+            else {
                 return false;
             }
         } else if (args.length == 1) {
@@ -439,16 +558,19 @@ public class MainListeners extends ListenerAdapter {
                 MainUtils.sendMess(channel, ":clown: __Titre :__" + j.getTitle());
                 MainUtils.sendMess(channel, j.getJoke());
                 return true;
-            } else if (cmd.equals("compteur")) {
+            }
+            else if (cmd.equals("compteur")) {
                 Thread thread = new Thread(new Compteur(channel));
                 thread.setDaemon(true);
                 thread.start();
                 return true;
-            } else if (cmd.equals("shutdown") && mess.getAuthor().getId().equals("301715312603168769")) {
+            }
+            else if (cmd.equals("shutdown") && mess.getAuthor().getId().equals("301715312603168769")) {
                 MainUtils.sendMess(channel, "Oof");
                 server.getJDA().shutdown();
                 return true;
-            } else if (cmd.equals("help")) {
+            }
+            else if (cmd.equals("help")) {
                 MainUtils.sendMess(channel,
                         ":rocket: signifie que la commande est réservée à May#8071. \n" +
                                 ":closed_lock_with_key: signifie que la commande est réservée au propriétaire du serveur. \n" +
@@ -474,7 +596,6 @@ public class MainListeners extends ListenerAdapter {
         } else {
             return false;
         }
-
     }
 
     private void greetings(MessageChannel channel) {
@@ -512,20 +633,23 @@ public class MainListeners extends ListenerAdapter {
         }
     }
 
-    private static void launchThreads(Guild server){
+    private static void launchThreads(Guild server) {
         Thread cantineThread = new Thread(() -> {
             while (true) {
                 if (MainUtils.getChannelByName(server, "cantine").isPresent() && server.getRoleById(server.getId()) != null) {
                     GuildChannel channel = MainUtils.getChannelByName(server, "cantine").get();
                     Role everyoneRole = server.getRoleById(server.getId());
-                    if (channel.getPermissionOverride(everyoneRole) != null) {
-                        channel.getPermissionOverride(everyoneRole).delete().queue();
-                    }
                     if (MainListeners.cantineOpening()) {
+                        if (channel.getPermissionOverride(everyoneRole) != null) {
+                            channel.getPermissionOverride(everyoneRole).delete().queue();
+                        }
                         channel.createPermissionOverride(everyoneRole).setAllow(Permission.MESSAGE_WRITE).queue();
                         MainUtils.sendMess(MainUtils.getChannelByName(server, "cantine").get(), "La cantine est maintenant ouverte ! :)");
                     }
                     if (MainListeners.cantineClosing()) {
+                        if (channel.getPermissionOverride(everyoneRole) != null) {
+                            channel.getPermissionOverride(everyoneRole).delete().queue();
+                        }
                         channel.createPermissionOverride(everyoneRole).setDeny(Permission.MESSAGE_WRITE).queue();
                         MainUtils.sendMess(MainUtils.getChannelByName(server, "cantine").get(), "La cantine est maintenant fermée ! :(");
                     }
@@ -549,5 +673,13 @@ public class MainListeners extends ListenerAdapter {
 
     private static boolean cantineClosing() {
         return MainUtils.getTime().equals("14:00:00") || MainUtils.getTime().equals("22:00:00");
+    }
+
+    private static boolean everyMinute() {
+        return MainUtils.getTime().split(":")[2].equals("00");
+    }
+
+    private static boolean everyHour() {
+        return MainUtils.getTime().split(":")[1].equals("00") && MainUtils.getTime().split(":")[2].equals("00");
     }
 }

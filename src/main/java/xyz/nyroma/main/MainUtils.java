@@ -28,33 +28,8 @@ public class MainUtils {
                 (channel) -> channel.sendMessage(message).queue()
         );
     }
-    public static Optional<Member> getMemberByID(Guild server, long id){
-        for(Member member : server.getMembers()){
-            if(member.getIdLong() == id){
-                return Optional.of(member);
-            }
-        }
-        return Optional.empty();
-    }
     public static void addMessEmote(Message mess, String code){ mess.addReaction(code).queue(); }
     public static String idMay = "301715312603168769";
-    public static boolean testFileExist(File file){
-        if(!file.exists()){
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return false;
-        } else {
-            return true;
-        }
-    }
-    public static void testFolderExist(File file){
-        if(!file.exists()){
-            file.mkdir();
-        }
-    }
     public static Optional<TextChannel> getChannelByName(Guild server, String name) {
         for(TextChannel ch : server.getTextChannels()){
             if(ch.getName().equals(name)){
