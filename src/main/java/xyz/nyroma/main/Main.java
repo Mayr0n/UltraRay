@@ -7,6 +7,10 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import xyz.nyroma.banks.BankCache;
 import xyz.nyroma.caches.ServerInfoCache;
 import xyz.nyroma.listeners.MainListeners;
 
@@ -27,5 +31,8 @@ public class Main {
         }
         System.out.println("Yoooooooooo je suis co !");
         ServerInfoCache.setup(new File("data/"));
+        BankCache.setup(new File("data/"));
+
+        Runtime.getRuntime().addShutdownHook(new Thread(BankCache::serializeAll));
     }
 }
